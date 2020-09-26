@@ -37,56 +37,82 @@ class _CategoryListState extends State<CategoryList> {
               color: bgColorPrimary,
               child: Row(
                 children: [
-                  Text(
-                    categoryList[index].categoryName,
-                    style: TextStyle(color: textColor, fontSize: 24.0),
-                  ),
-                  SizedBox(
-                    width: 20.0,
-                  ),
-                  DropdownButton(
-                      hint: Text(
-                        categoryList[index].categoryColour,
-                        style: TextStyle(
-                          color: categoryColorsMap[
-                              categoryList[index].categoryColour],
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(10.0, 0, 0, 0),
+                    child: DropdownButton(
+                        hint: Text(
+                          categoryList[index].categoryColour,
+                          style: TextStyle(
+                            color: categoryColorsMap[
+                                categoryList[index].categoryColour],
+                          ),
                         ),
+                        value: categoryList[index].categoryColour,
+                        items: categoryColorsList.map((String colour) {
+                          return DropdownMenuItem(
+                              value: colour,
+                              child: Text(
+                                colour,
+                                style: TextStyle(
+                                    color: categoryColorsMap[colour],
+                                    fontSize: 20.0),
+                              ));
+                        }).toList(),
+                        onChanged: ((String newColour) {
+                          categoryList[index].categoryColour = newColour;
+                        })),
+                  ),
+                  Flexible(
+                    child: ListTile(
+                      title: Text(
+                        categoryList[index].categoryName,
+                        style: TextStyle(color: textColor, fontSize: 24.0),
                       ),
-                      value: categoryList[index].categoryColour,
-                      items: categoryColorsList.map((String colour) {
-                        return DropdownMenuItem(
-                            value: colour,
-                            child: Text(
-                              colour,
-                              style: TextStyle(
-                                  color: categoryColorsMap[colour],
-                                  fontSize: 20.0),
-                            ));
-                      }),
-                      onChanged: ((String newColour) {
-                        categoryList[index].categoryColour = newColour;
-                      }))
+                      trailing: IconButton(
+                          icon: Icon(
+                            Icons.delete,
+                            color: textColor,
+                          ),
+                          onPressed: () {
+                            deleteCategory(index);
+                          }),
+                    ),
+                  ),
                 ],
               ),
             );
           },
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         backgroundColor: blueButton,
         onPressed: (() {
           saveColours();
           Navigator.pop(context);
         }),
-        child: Icon(
+        icon: Icon(
           Icons.check,
           color: textColor,
         ),
+        label: Text(
+          'SAVE',
+          style: TextStyle(
+            fontSize: 18.0,
+            color: textColor,
+          ),
+        ),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 
   void saveColours() {
     //saves all the colour changes
+  }
+
+  void deleteCategory(int index) {
+    setState(() {
+      categoryList.removeAt(index);
+    });
   }
 }
