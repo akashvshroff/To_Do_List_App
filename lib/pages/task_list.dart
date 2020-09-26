@@ -12,6 +12,7 @@ class _TaskListState extends State<TaskList> {
     Task('Call up Joe', 'Call up asap', 2, 1, false),
     Task('Submit project idea', 'Do the work by tomorrow', 1, 4, false),
   ];
+  List categoryList = [];
   @override
   Widget build(BuildContext context) {
     taskList.sort((b, a) => a.taskPriority.compareTo(b.taskPriority));
@@ -41,7 +42,9 @@ class _TaskListState extends State<TaskList> {
               Icons.not_interested,
               color: textColor,
             ),
-            onPressed: () {},
+            onPressed: () {
+              filterTasks(0);
+            },
             color: textColor,
           )
         ],
@@ -133,6 +136,22 @@ class _TaskListState extends State<TaskList> {
     setState(() {
       taskList.removeAt(index);
     });
+  }
+
+  void filterTasks(int category) {
+    updateList();
+    if (category != 0) {
+      int count = taskList.length;
+      List<Task> filtered = [];
+      for (int i = 0; i < count; i++) {
+        if (taskList[i].taskCategory == category) {
+          filtered.add(taskList[i]);
+        }
+      }
+      setState(() {
+        taskList = filtered;
+      });
+    }
   }
 
   void updateList() {}
