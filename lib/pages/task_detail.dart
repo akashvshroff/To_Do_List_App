@@ -13,7 +13,7 @@ class _TaskDetailState extends State<TaskDetail> {
   TextEditingController taskDescription = TextEditingController();
   List categoryList = [];
   String categoryChoice;
-  int priorityLevel = 1;
+  int priorityLevel;
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +23,7 @@ class _TaskDetailState extends State<TaskDetail> {
         ? data['description']
         : taskDescription.text;
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: bgColorSecondary,
       appBar: AppBar(
         backgroundColor: bgColorPrimary,
@@ -42,6 +43,8 @@ class _TaskDetailState extends State<TaskDetail> {
                     style: TextStyle(color: textColor, fontSize: 24.0),
                     controller: taskName,
                     decoration: InputDecoration(
+                      helperText: "Task Name",
+                      helperStyle: TextStyle(color: textColor, fontSize: 18.0),
                       fillColor: bgColorPrimary,
                       filled: true,
                     )),
@@ -54,10 +57,11 @@ class _TaskDetailState extends State<TaskDetail> {
                     showCursor: false,
                     style: TextStyle(color: textColor, fontSize: 24.0),
                     controller: taskDescription,
-                    textAlignVertical: TextAlignVertical.top,
-                    minLines: 3,
-                    maxLines: 5,
+                    maxLines: 3,
+                    textAlignVertical: TextAlignVertical.center,
                     decoration: InputDecoration(
+                      helperText: "Optional Description",
+                      helperStyle: TextStyle(color: textColor, fontSize: 18.0),
                       fillColor: bgColorPrimary,
                       filled: true,
                     )),
@@ -78,9 +82,13 @@ class _TaskDetailState extends State<TaskDetail> {
                       ),
                     ),
                     SizedBox(
-                      width: 50.0,
+                      width: 30.0,
                     ),
                     DropdownButton(
+                      hint: Text(
+                        'Pick Category',
+                        style: TextStyle(fontSize: 14.0, color: textColor),
+                      ),
                       dropdownColor: bgColorPrimary,
                       value: categoryChoice,
                       items: ['Personal', 'College', 'School', 'Work']
@@ -105,14 +113,16 @@ class _TaskDetailState extends State<TaskDetail> {
                       iconSize: 30,
                     ),
                     SizedBox(
-                      width: 15.0,
+                      width: 5.0,
                     ),
                     IconButton(
                       icon: Icon(
                         Icons.edit,
                         color: textColor,
                       ),
-                      onPressed: null,
+                      onPressed: (() {
+                        categoryScreen();
+                      }),
                       color: textColor,
                     )
                   ],
@@ -129,14 +139,18 @@ class _TaskDetailState extends State<TaskDetail> {
                     Padding(
                       padding: const EdgeInsets.fromLTRB(10.0, 0, 10.0, 0),
                       child: Text(
-                        'Priority Level',
+                        'Priority ',
                         style: TextStyle(fontSize: 24.0, color: textColor),
                       ),
                     ),
                     SizedBox(
-                      width: 70.0,
+                      width: 60.0,
                     ),
                     DropdownButton(
+                        hint: Text(
+                          'Pick level',
+                          style: TextStyle(fontSize: 16.0, color: textColor),
+                        ),
                         icon: Icon(
                           Icons.arrow_downward,
                           color: textColor,
@@ -162,7 +176,7 @@ class _TaskDetailState extends State<TaskDetail> {
                 ),
               ),
               SizedBox(
-                height: 60.0,
+                height: 40.0,
               ),
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
                 RaisedButton(
@@ -189,6 +203,10 @@ class _TaskDetailState extends State<TaskDetail> {
             ],
           )),
     );
+  }
+
+  void categoryScreen() {
+    Navigator.pushNamed(context, '/category_list');
   }
 
   int getPriorityLevel(String priority) {
