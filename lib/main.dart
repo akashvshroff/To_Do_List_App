@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:to_do_app/pages/category_list.dart';
+import 'package:to_do_app/pages/task_detail.dart';
+import 'package:to_do_app/pages/task_list.dart';
 
 void main() {
   runApp(MyApp());
