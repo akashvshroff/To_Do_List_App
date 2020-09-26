@@ -80,6 +80,7 @@ class _TaskListState extends State<TaskList> {
                       child: ListTile(
                         onTap: () {
                           editTask(
+                              'EDIT',
                               taskList[index].taskName,
                               taskList[index].taskDescription,
                               taskList[index].taskPriority,
@@ -115,7 +116,7 @@ class _TaskListState extends State<TaskList> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          editTask('Task name', 'Task Description', 1, 0);
+          editTask('ADD', 'Task name', 'Task Description', 1, 0);
         },
         child: Icon(
           Icons.add,
@@ -156,8 +157,10 @@ class _TaskListState extends State<TaskList> {
 
   void updateList() {}
 
-  void editTask(String name, String description, int priority, int category) {
+  void editTask(String title, String name, String description, int priority,
+      int category) {
     Map data = {
+      'title': title,
       'name': name,
       'description': description,
       'priority': priority,

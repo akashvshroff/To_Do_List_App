@@ -7,8 +7,16 @@ class TaskDetail extends StatefulWidget {
 }
 
 class _TaskDetailState extends State<TaskDetail> {
+  Map data = {};
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    data = ModalRoute.of(context).settings.arguments;
+    return Scaffold(
+      backgroundColor: bgColorSecondary,
+      appBar: AppBar(
+        backgroundColor: bgColorPrimary,
+      ),
+    );
   }
 }
