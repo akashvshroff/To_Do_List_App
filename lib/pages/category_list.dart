@@ -75,6 +75,7 @@ class _CategoryListState extends State<CategoryList> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: blueButton,
         onPressed: (() {
+          saveColours();
           Navigator.pop(context);
         }),
         child: Icon(
@@ -83,5 +84,9 @@ class _CategoryListState extends State<CategoryList> {
         ),
       ),
     );
+  }
+
+  void saveColours() {
+    //saves all the colour changes
   }
 }
