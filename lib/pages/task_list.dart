@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:to_do_app/colours.dart';
 import 'package:to_do_app/models/task_model.dart';
+import 'package:to_do_app/models/category_model.dart';
 
 class TaskList extends StatefulWidget {
   @override
@@ -9,10 +10,20 @@ class TaskList extends StatefulWidget {
 
 class _TaskListState extends State<TaskList> {
   List<Task> taskList = [
-    Task('Call up Joe', 'Call up asap', 2, 1, false),
-    Task('Submit project idea', 'Do the work by tomorrow', 1, 4, false),
+    Task('Call up L', 'Call up asap', 2, 1, false),
+    Task('Submit project idea', '', 1, 2, false),
+    Task('DSA 3rd Assignment', 'Have to get 80%', 2, 5, false),
+    Task('Take Bozo to the vet', 'His ears have to be checked', 2, 1, false),
+    Task('Flutter app finish', 'Attach db', 1, 4, false),
   ];
-  List categoryList = [];
+  List<Category> categoryList = [
+    Category("Personal", 1, 'blue'),
+    Category("Work", 4, 'red'),
+    Category("School", 2, 'green'),
+    Category("College", 3, 'yellow'),
+    Category("Programming", 5, 'indigo'),
+  ];
+  int categoryChoice;
   @override
   Widget build(BuildContext context) {
     taskList.sort((b, a) => a.taskPriority.compareTo(b.taskPriority));
@@ -27,19 +38,38 @@ class _TaskListState extends State<TaskList> {
             color: textColor,
           ),
         ),
-        centerTitle: true,
+        centerTitle: false,
         actions: [
           DropdownButton(
-            items: null,
-            onChanged: null,
+            hint: Text(
+              'Filter',
+              style: TextStyle(
+                color: textColor,
+              ),
+            ),
+            dropdownColor: bgColorPrimary,
+            value: categoryChoice,
+            items: categoryList.map((Category instance) {
+              return DropdownMenuItem(
+                  value: instance.categoryId,
+                  child: Text(
+                    instance.categoryName,
+                    style: TextStyle(
+                        color: categoryColorsMap[instance.categoryColour],
+                        fontSize: 16.0),
+                  ));
+            }).toList(),
+            onChanged: (int newValue) {
+              filterTasks(newValue);
+            },
             icon: Icon(
-              Icons.find_replace,
+              Icons.filter_list,
               color: textColor,
             ),
           ),
           IconButton(
             icon: Icon(
-              Icons.not_interested,
+              Icons.clear,
               color: textColor,
             ),
             onPressed: () {
@@ -94,9 +124,11 @@ class _TaskListState extends State<TaskList> {
                           ),
                         ),
                         subtitle: Text(
-                          'Category'.toUpperCase(),
+                          getCategoryName(taskList[index].taskCategory)
+                              .toUpperCase(), //get category name from db via id
                           style: TextStyle(
-                            color: categoryColorsMap['red'],
+                            color: getCategoryColour(taskList[index]
+                                .taskCategory), //get category colour from db via id
                           ),
                         ),
                         trailing: IconButton(
@@ -149,10 +181,31 @@ class _TaskListState extends State<TaskList> {
           filtered.add(taskList[i]);
         }
       }
+      print(filtered);
       setState(() {
         taskList = filtered;
       });
     }
+  }
+
+  String getCategoryName(int categoryID) {
+    int count = categoryList.length;
+    for (int i = 0; i < count; i++) {
+      if (categoryList[i].categoryId == categoryID) {
+        return categoryList[i].categoryName;
+      }
+    }
+    return 'Default';
+  }
+
+  Color getCategoryColour(int categoryID) {
+    int count = categoryList.length;
+    for (int i = 0; i < count; i++) {
+      if (categoryList[i].categoryId == categoryID) {
+        return categoryColorsMap[categoryList[i].categoryColour];
+      }
+    }
+    return bgColorSecondary;
   }
 
   void updateList() {}

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:to_do_app/colours.dart';
+import 'package:to_do_app/models/category_model.dart';
 
 class TaskDetail extends StatefulWidget {
   @override
@@ -11,8 +12,14 @@ class _TaskDetailState extends State<TaskDetail> {
 
   TextEditingController taskName = TextEditingController();
   TextEditingController taskDescription = TextEditingController();
-  List categoryList = [];
-  String categoryChoice;
+  List<Category> categoryList = [
+    Category("Personal", 1, 'blue'),
+    Category("Work", 4, 'red'),
+    Category("School", 2, 'green'),
+    Category("College", 3, 'yellow'),
+    Category("Programming", 5, 'indigo'),
+  ];
+  int categoryChoice;
   int priorityLevel;
 
   @override
@@ -82,26 +89,28 @@ class _TaskDetailState extends State<TaskDetail> {
                       ),
                     ),
                     SizedBox(
-                      width: 30.0,
+                      width: 20.0,
                     ),
                     DropdownButton(
                       hint: Text(
-                        'Pick Category',
-                        style: TextStyle(fontSize: 14.0, color: textColor),
+                        getCategoryName(data['category']),
+                        style: TextStyle(
+                            fontSize: 20.0,
+                            color: getCategoryColour(data['category'])),
                       ),
                       dropdownColor: bgColorPrimary,
                       value: categoryChoice,
-                      items: ['Personal', 'College', 'School', 'Work']
-                          .map((String name) {
+                      items: categoryList.map((Category instance) {
                         return DropdownMenuItem(
-                            value: name,
+                            value: instance.categoryId,
                             child: Text(
-                              name,
-                              style:
-                                  TextStyle(color: textColor, fontSize: 24.0),
+                              instance.categoryName,
+                              style: TextStyle(
+                                  color: getCategoryColour(instance.categoryId),
+                                  fontSize: 20.0),
                             ));
                       }).toList(),
-                      onChanged: ((String newValue) {
+                      onChanged: ((int newValue) {
                         setState(() {
                           categoryChoice = newValue;
                         });
@@ -160,11 +169,10 @@ class _TaskDetailState extends State<TaskDetail> {
                         items: ["Normal", "Urgent"].map((priority) {
                           return DropdownMenuItem(
                             value: getPriorityLevel(priority),
-                            child: Text(
-                              priority,
-                              style:
-                                  TextStyle(fontSize: 24.0, color: textColor),
-                            ),
+                            child: Text(priority,
+                                style: TextStyle(
+                                    fontSize: 24.0,
+                                    color: getPriorityColour(priority))),
                           );
                         }).toList(),
                         onChanged: ((int newValue) {
@@ -205,6 +213,26 @@ class _TaskDetailState extends State<TaskDetail> {
     );
   }
 
+  String getCategoryName(int categoryID) {
+    int count = categoryList.length;
+    for (int i = 0; i < count; i++) {
+      if (categoryList[i].categoryId == categoryID) {
+        return categoryList[i].categoryName;
+      }
+    }
+    return 'Default';
+  }
+
+  Color getCategoryColour(int categoryID) {
+    int count = categoryList.length;
+    for (int i = 0; i < count; i++) {
+      if (categoryList[i].categoryId == categoryID) {
+        return categoryColorsMap[categoryList[i].categoryColour];
+      }
+    }
+    return bgColorSecondary;
+  }
+
   void categoryScreen() {
     Navigator.pushNamed(context, '/category_list');
   }
@@ -215,5 +243,11 @@ class _TaskDetailState extends State<TaskDetail> {
     } else {
       return 2;
     }
+  }
+
+  Color getPriorityColour(String priority) {
+    Color priorityColour =
+        (getPriorityLevel(priority) == 1) ? redButton : blueButton;
+    return priorityColour;
   }
 }
