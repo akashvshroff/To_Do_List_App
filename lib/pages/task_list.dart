@@ -80,7 +80,7 @@ class _TaskListState extends State<TaskList> {
                       child: ListTile(
                         onTap: () {
                           editTask(
-                              'EDIT',
+                              'EDIT TASK',
                               taskList[index].taskName,
                               taskList[index].taskDescription,
                               taskList[index].taskPriority,
@@ -116,7 +116,7 @@ class _TaskListState extends State<TaskList> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          editTask('ADD', 'Task name', 'Task Description', 1, 0);
+          editTask('ADD TASK', 'Enter task', 'Enter description', 1, 0);
         },
         child: Icon(
           Icons.add,
