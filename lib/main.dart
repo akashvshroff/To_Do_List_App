@@ -9,7 +9,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      initialRoute: '/',
+      routes: {
+        '/': (context) => TaskList(),
+        '/task_detail': (context) => TaskDetail(),
+        '/category_list': (context) => CategoryList(),
+      },
     );
   }
 }
