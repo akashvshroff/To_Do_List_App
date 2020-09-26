@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 Color bgColorPrimary = Colors.black;
 Color textColor = Colors.white;
-Color bgColorSecondary = Colors.grey[850];
+Color bgColorSecondary = Colors.grey[900];
 Color redButton = Colors.redAccent;
 Color blueButton = Colors.lightBlueAccent;
 Color greenButton = Colors.greenAccent;
