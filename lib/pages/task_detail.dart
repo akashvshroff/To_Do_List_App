@@ -16,13 +16,17 @@ class _TaskDetailState extends State<TaskDetail> {
   TextEditingController taskName = TextEditingController();
   TextEditingController taskDescription = TextEditingController();
   List<Category> categoryList;
-  int categoryCount;
+  int categoryCount = 0;
   int categoryChoice;
   int priorityLevel;
   List<String> taskPriorities = ["Normal", "Urgent"];
 
   @override
   Widget build(BuildContext context) {
+    if (categoryList == []) {
+      categoryList = List<Category>();
+      updateList();
+    }
     data = ModalRoute.of(context).settings.arguments;
     taskName.text = (taskName.text == '') ? data['name'] : taskName.text;
     taskDescription.text = (taskDescription.text == '')
@@ -49,8 +53,8 @@ class _TaskDetailState extends State<TaskDetail> {
                     style: TextStyle(color: textColor, fontSize: 24.0),
                     controller: taskName,
                     decoration: InputDecoration(
-                      helperText: "Task Name",
-                      helperStyle: TextStyle(color: textColor, fontSize: 18.0),
+                      hintText: "Task Name",
+                      hintStyle: TextStyle(color: textColor, fontSize: 18.0),
                       fillColor: bgColorPrimary,
                       filled: true,
                     )),
@@ -66,8 +70,8 @@ class _TaskDetailState extends State<TaskDetail> {
                     maxLines: 3,
                     textAlignVertical: TextAlignVertical.center,
                     decoration: InputDecoration(
-                      helperText: "Optional Description",
-                      helperStyle: TextStyle(color: textColor, fontSize: 18.0),
+                      hintText: "Optional Description",
+                      hintStyle: TextStyle(color: textColor, fontSize: 18.0),
                       fillColor: bgColorPrimary,
                       filled: true,
                     )),
@@ -285,14 +289,14 @@ class _TaskDetailState extends State<TaskDetail> {
       categoryListFuture.then((value) {
         setState(() {
           this.categoryList = value;
-          this.categoryCount = this.categoryList.length;
+          this.categoryCount = value.length;
         });
       });
     });
   }
 
   String getCategoryName(int categoryID) {
-    int count = categoryList.length;
+    int count = categoryCount;
     for (int i = 0; i < count; i++) {
       if (categoryList[i].categoryId == categoryID) {
         return categoryList[i].categoryName;
@@ -302,7 +306,7 @@ class _TaskDetailState extends State<TaskDetail> {
   }
 
   Color getCategoryColour(int categoryID) {
-    int count = categoryList.length;
+    int count = categoryCount;
     for (int i = 0; i < count; i++) {
       if (categoryList[i].categoryId == categoryID) {
         return categoryColorsMap[categoryList[i].categoryColour];
