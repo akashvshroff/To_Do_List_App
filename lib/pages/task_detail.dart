@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:to_do_app/colours.dart';
 import 'package:to_do_app/models/category_model.dart';
+import 'package:to_do_app/models/task_model.dart';
+import 'package:to_do_app/utils/database_helper.dart';
+import 'package:sqflite/sqflite.dart';
 
 class TaskDetail extends StatefulWidget {
   @override
@@ -9,7 +12,7 @@ class TaskDetail extends StatefulWidget {
 
 class _TaskDetailState extends State<TaskDetail> {
   Map data = {};
-
+  DatabaseHelper databaseHelper = DatabaseHelper();
   TextEditingController taskName = TextEditingController();
   TextEditingController taskDescription = TextEditingController();
   List<Category> categoryList;
@@ -96,17 +99,19 @@ class _TaskDetailState extends State<TaskDetail> {
                       ),
                       dropdownColor: bgColorPrimary,
                       value: categoryChoice,
-                      items: categoryList.map((Category instance) {
-                        return DropdownMenuItem(
-                            value: instance.categoryId,
-                            child: Text(
-                              instance.categoryName,
-                              style: TextStyle(
-                                  color: getCategoryColour(instance.categoryId),
-                                  fontSize: 20.0),
-                            ));
-                      }).toList(),
-                      onChanged: ((int newValue) {
+                      items: categoryList?.map((Category instance) {
+                            return DropdownMenuItem(
+                                value: instance.categoryId,
+                                child: Text(
+                                  instance.categoryName,
+                                  style: TextStyle(
+                                      color: getCategoryColour(
+                                          instance.categoryId),
+                                      fontSize: 20.0),
+                                ));
+                          })?.toList() ??
+                          [],
+                      onChanged: ((newValue) {
                         setState(() {
                           categoryChoice = newValue;
                         });
@@ -186,7 +191,9 @@ class _TaskDetailState extends State<TaskDetail> {
                 RaisedButton(
                   padding:
                       EdgeInsets.symmetric(horizontal: 55.0, vertical: 20.0),
-                  onPressed: () {},
+                  onPressed: () {
+                    saveTask();
+                  },
                   child: Text(
                     "SAVE",
                     style: TextStyle(fontSize: 24.0, color: textColor),
@@ -207,6 +214,81 @@ class _TaskDetailState extends State<TaskDetail> {
             ],
           )),
     );
+  }
+
+  void deleteTask() async {
+    moveToPrev();
+    if (data['id'] == null) {
+      showAlertDialog("Status", "No task was deleted.");
+      return;
+    }
+
+    int result = await databaseHelper.deleteTask(data['id']);
+    if (result != 0) {
+      showAlertDialog("Success", "Note deleted succesfully.");
+    } else {
+      showAlertDialog("Error", "Note cannot be deleted.");
+    }
+  }
+
+  void moveToPrev() {
+    Navigator.pop(context);
+  }
+
+  void showAlertDialog(String title, String message) {
+    AlertDialog alertDialog = AlertDialog(
+      backgroundColor: bgColorPrimary,
+      title: Text(title.toUpperCase()),
+      titleTextStyle: TextStyle(color: textColor, fontSize: 24.0),
+      content: Text(
+        message,
+        style: TextStyle(color: textColor, fontSize: 20.0),
+      ),
+    );
+    showDialog(context: context, builder: (_) => alertDialog);
+  }
+
+  void saveTask() async {
+    moveToPrev();
+    int result;
+    if (data['id'] != null) {
+      //updating a task
+      Task newTask = Task.withId(
+          data['id'],
+          taskName.text.toString(),
+          taskDescription.text.toString(),
+          priorityLevel,
+          categoryChoice,
+          false);
+      result = await databaseHelper.updateTask(newTask);
+    } else {
+      Task newTask = Task(
+          taskName.text.toString(),
+          taskDescription.text.toString(),
+          priorityLevel,
+          categoryChoice,
+          false);
+      result = await databaseHelper.insertTask(newTask);
+    }
+    if (result != 0) {
+      showAlertDialog("Success", "Task saved successfully.");
+    } else {
+      showAlertDialog("Error", "Task cannot be saved.");
+    }
+  }
+
+  void updateList() {
+    Future<Database> dbFuture = databaseHelper.initialiseDatabase();
+    dbFuture.then((database) {
+      Future<List<Category>> categoryListFuture =
+          databaseHelper.getCategoryList();
+      categoryListFuture.then((value) {
+        setState(() {
+          this.categoryList = value;
+          this.categoryCount = this.categoryList.length;
+        });
+      });
+    });
   }
 
   String getCategoryName(int categoryID) {
