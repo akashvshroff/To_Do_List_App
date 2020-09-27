@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:to_do_app/colours.dart';
 import 'package:to_do_app/models/task_model.dart';
 import 'package:to_do_app/models/category_model.dart';
+import 'package:to_do_app/utils/database_helper.dart';
+import 'package:sqflite/sqflite.dart';
 
 class TaskList extends StatefulWidget {
   @override
@@ -9,14 +11,17 @@ class TaskList extends StatefulWidget {
 }
 
 class _TaskListState extends State<TaskList> {
+  DatabaseHelper databaseHelper = DatabaseHelper();
   List<Task> taskList;
-  int taskCount;
+  int taskCount = 0;
   List<Category> categoryList;
-  int categoryCount;
+  int categoryCount = 0;
   int categoryChoice;
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: bgColorSecondary,
       appBar: AppBar(
         backgroundColor: bgColorPrimary,
@@ -38,17 +43,18 @@ class _TaskListState extends State<TaskList> {
             ),
             dropdownColor: bgColorPrimary,
             value: categoryChoice,
-            items: categoryList.map((Category instance) {
-              return DropdownMenuItem(
-                  value: instance.categoryId,
-                  child: Text(
-                    instance.categoryName,
-                    style: TextStyle(
-                        color: categoryColorsMap[instance.categoryColour],
-                        fontSize: 16.0),
-                  ));
-            }).toList(),
-            onChanged: (int newValue) {
+            items: categoryList?.map((Category instance) {
+                  return DropdownMenuItem(
+                      value: instance.categoryId,
+                      child: Text(
+                        instance.categoryName,
+                        style: TextStyle(
+                            color: categoryColorsMap[instance.categoryColour],
+                            fontSize: 16.0),
+                      ));
+                })?.toList() ??
+                [],
+            onChanged: (newValue) {
               filterTasks(newValue);
             },
             icon: Icon(
@@ -149,20 +155,57 @@ class _TaskListState extends State<TaskList> {
     );
   }
 
+  void showSnackBar(BuildContext context, String message, bool success) {
+    Color snackbarColour = success ? greenButton : redButton;
+    final snackbar = SnackBar(
+        backgroundColor: bgColorPrimary,
+        action: SnackBarAction(
+            label: 'OK',
+            onPressed: () {
+              _scaffoldKey.currentState.hideCurrentSnackBar();
+            }),
+        content: Text(message,
+            style: TextStyle(color: snackbarColour, fontSize: 20.0)));
+    _scaffoldKey.currentState.showSnackBar(snackbar);
+  }
+
   Color getActiveColor(int priority) {
     Color colourDisplay;
     colourDisplay = (priority == 1) ? blueButton : redButton;
     return colourDisplay;
   }
 
-  void deleteTask(int index) {
-    setState(() {
-      taskList.removeAt(index);
+  void deleteTask(int index) async {
+    int result = await databaseHelper.deleteTask(taskList[index].id);
+    if (result != 0) {
+      showSnackBar(context, 'Success: Task Deleted.', true);
+    }
+  }
+
+  void updateList() {
+    Future<Database> dbFuture = databaseHelper.initialiseDatabase();
+    dbFuture.then((database) {
+      Future<List<Task>> taskListFuture = databaseHelper.getTaskList();
+      taskListFuture.then((tasks) {
+        setState(() {
+          this.taskList = tasks;
+          this.taskCount = this.taskList.length;
+        });
+      });
+
+      Future<List<Category>> categoryListFuture =
+          databaseHelper.getCategoryList();
+      categoryListFuture.then((value) {
+        setState(() {
+          this.categoryList = value;
+          this.categoryCount = this.categoryList.length;
+        });
+      });
     });
   }
 
-  void filterTasks(int category) {
-    updateList();
+  void filterTasks(int category) async {
+    await updateList();
     if (category != 0) {
       int count = taskList.length;
       List<Task> filtered = [];
@@ -197,8 +240,6 @@ class _TaskListState extends State<TaskList> {
     }
     return bgColorSecondary;
   }
-
-  void updateList() {}
 
   void editTask(
       String title, String name, String description, int priority, int category,
