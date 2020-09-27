@@ -8,13 +8,8 @@ class CategoryList extends StatefulWidget {
 }
 
 class _CategoryListState extends State<CategoryList> {
-  List<Category> categoryList = [
-    Category("Personal", 1, 'blue'),
-    Category("Work", 4, 'red'),
-    Category("School", 2, 'green'),
-    Category("College", 3, 'yellow'),
-    Category("Programming", 5, 'indigo'),
-  ];
+  List<Category> categoryList;
+  int categoryCount;
 
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -256,7 +251,7 @@ class _CategoryListState extends State<CategoryList> {
   }
 
   void createCategory(String categoryName, String categoryColour) {
-    //Creates a new category and adds it to the db
+    //Creates a new category object and adds it to the db
     print(categoryName);
     print(categoryColour);
 

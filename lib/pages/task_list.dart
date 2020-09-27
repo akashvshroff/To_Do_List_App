@@ -9,24 +9,13 @@ class TaskList extends StatefulWidget {
 }
 
 class _TaskListState extends State<TaskList> {
-  List<Task> taskList = [
-    Task('Call up L', 'Call up asap', 2, 1, false),
-    Task('Submit project idea', '', 1, 2, false),
-    Task('DSA 3rd Assignment', 'Have to get 80%', 2, 5, false),
-    Task('Take Bozo to the vet', 'His ears have to be checked', 2, 1, false),
-    Task('Flutter app finish', 'Attach db', 1, 4, false),
-  ];
-  List<Category> categoryList = [
-    Category("Personal", 1, 'blue'),
-    Category("Work", 4, 'red'),
-    Category("School", 2, 'green'),
-    Category("College", 3, 'yellow'),
-    Category("Programming", 5, 'indigo'),
-  ];
+  List<Task> taskList;
+  int taskCount;
+  List<Category> categoryList;
+  int categoryCount;
   int categoryChoice;
   @override
   Widget build(BuildContext context) {
-    taskList.sort((b, a) => a.taskPriority.compareTo(b.taskPriority));
     return Scaffold(
       backgroundColor: bgColorSecondary,
       appBar: AppBar(
@@ -82,7 +71,7 @@ class _TaskListState extends State<TaskList> {
       body: Padding(
         padding: EdgeInsets.fromLTRB(0, 4.0, 0, 0),
         child: ListView.builder(
-          itemCount: taskList.length,
+          itemCount: taskCount,
           itemBuilder: (context, index) {
             return Padding(
               padding:
@@ -114,7 +103,8 @@ class _TaskListState extends State<TaskList> {
                               taskList[index].taskName,
                               taskList[index].taskDescription,
                               taskList[index].taskPriority,
-                              taskList[index].taskCategory);
+                              taskList[index].taskCategory,
+                              taskList[index].id);
                         },
                         title: Text(
                           taskList[index].taskName,
@@ -210,9 +200,11 @@ class _TaskListState extends State<TaskList> {
 
   void updateList() {}
 
-  void editTask(String title, String name, String description, int priority,
-      int category) {
+  void editTask(
+      String title, String name, String description, int priority, int category,
+      [int id]) {
     Map data = {
+      'id': id,
       'title': title,
       'name': name,
       'description': description,

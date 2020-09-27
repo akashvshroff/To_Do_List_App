@@ -12,15 +12,11 @@ class _TaskDetailState extends State<TaskDetail> {
 
   TextEditingController taskName = TextEditingController();
   TextEditingController taskDescription = TextEditingController();
-  List<Category> categoryList = [
-    Category("Personal", 1, 'blue'),
-    Category("Work", 4, 'red'),
-    Category("School", 2, 'green'),
-    Category("College", 3, 'yellow'),
-    Category("Programming", 5, 'indigo'),
-  ];
+  List<Category> categoryList;
+  int categoryCount;
   int categoryChoice;
   int priorityLevel;
+  List<String> taskPriorities = ["Normal", "Urgent"];
 
   @override
   Widget build(BuildContext context) {
@@ -166,7 +162,7 @@ class _TaskDetailState extends State<TaskDetail> {
                         ),
                         dropdownColor: bgColorPrimary,
                         value: priorityLevel,
-                        items: ["Normal", "Urgent"].map((priority) {
+                        items: taskPriorities.map((priority) {
                           return DropdownMenuItem(
                             value: getPriorityLevel(priority),
                             child: Text(priority,
