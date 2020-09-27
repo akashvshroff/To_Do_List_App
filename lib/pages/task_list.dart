@@ -18,8 +18,14 @@ class _TaskListState extends State<TaskList> {
   int categoryCount = 0;
   int categoryChoice;
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
+    if (taskList == null || categoryList == null) {
+      taskList = List<Task>();
+      categoryList = List<Category>();
+      updateList();
+    }
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: bgColorSecondary,
@@ -144,7 +150,7 @@ class _TaskListState extends State<TaskList> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          editTask('ADD TASK', 'Enter task', 'Enter description', 1, 0);
+          editTask('ADD TASK', '', '', 1, 0);
         },
         child: Icon(
           Icons.add,
@@ -180,6 +186,7 @@ class _TaskListState extends State<TaskList> {
     if (result != 0) {
       showSnackBar(context, 'Success: Task Deleted.', true);
     }
+    updateList();
   }
 
   void updateList() {
@@ -189,7 +196,7 @@ class _TaskListState extends State<TaskList> {
       taskListFuture.then((tasks) {
         setState(() {
           this.taskList = tasks;
-          this.taskCount = this.taskList.length;
+          this.taskCount = tasks.length;
         });
       });
 
@@ -198,14 +205,14 @@ class _TaskListState extends State<TaskList> {
       categoryListFuture.then((value) {
         setState(() {
           this.categoryList = value;
-          this.categoryCount = this.categoryList.length;
+          this.categoryCount = value.length;
         });
       });
     });
   }
 
-  void filterTasks(int category) async {
-    await updateList();
+  void filterTasks(int category) {
+    updateList();
     if (category != 0) {
       int count = taskList.length;
       List<Task> filtered = [];
