@@ -230,7 +230,7 @@ class _TaskDetailState extends State<TaskDetail> {
         return categoryColorsMap[categoryList[i].categoryColour];
       }
     }
-    return bgColorSecondary;
+    return textColor;
   }
 
   void categoryScreen() {
