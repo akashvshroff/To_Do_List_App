@@ -255,19 +255,26 @@ class _CategoryListState extends State<CategoryList> {
     _scaffoldKey.currentState.showSnackBar(snackbar);
   }
 
-  void saveCategory(String categoryName, String categoryColour) {
-    //saves a newly added category - have to check name matching
+  void createCategories(String categoryName, String categoryColour) {
+    //Creates a new category and adds it to the list
     print(categoryName);
     print(categoryColour);
+
+    saveColours();
   }
 
   void saveColours() {
-    //saves all the colour changes
+    //saves all the categories on the list to the db
+  }
+
+  void updateCategoryList() {
+    //gets category list from the db
   }
 
   void deleteCategory(int index) {
     setState(() {
       categoryList.removeAt(index);
     });
+    saveColours();
   }
 }
