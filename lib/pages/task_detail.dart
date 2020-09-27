@@ -23,7 +23,7 @@ class _TaskDetailState extends State<TaskDetail> {
 
   @override
   Widget build(BuildContext context) {
-    if (categoryList == []) {
+    if (categoryList == null) {
       categoryList = List<Category>();
       updateList();
     }
@@ -32,6 +32,8 @@ class _TaskDetailState extends State<TaskDetail> {
     taskDescription.text = (taskDescription.text == '')
         ? data['description']
         : taskDescription.text;
+    priorityLevel = data['priority'];
+    categoryChoice = data['category'];
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: bgColorSecondary,
@@ -103,7 +105,7 @@ class _TaskDetailState extends State<TaskDetail> {
                       ),
                       dropdownColor: bgColorPrimary,
                       value: categoryChoice,
-                      items: categoryList?.map((Category instance) {
+                      items: this.categoryList?.map((Category instance) {
                             return DropdownMenuItem(
                                 value: instance.categoryId,
                                 child: Text(
@@ -121,7 +123,7 @@ class _TaskDetailState extends State<TaskDetail> {
                         });
                       }),
                       icon: Icon(
-                        Icons.category,
+                        Icons.arrow_downward,
                         color: textColor,
                       ),
                       iconSize: 30,
@@ -235,8 +237,9 @@ class _TaskDetailState extends State<TaskDetail> {
     }
   }
 
-  void moveToPrev() {
-    Navigator.pop(context);
+  void moveToPrev() async {
+    var result = await Navigator.pop(context);
+    updateList();
   }
 
   void showAlertDialog(String title, String message) {
@@ -286,10 +289,10 @@ class _TaskDetailState extends State<TaskDetail> {
     dbFuture.then((database) {
       Future<List<Category>> categoryListFuture =
           databaseHelper.getCategoryList();
-      categoryListFuture.then((value) {
+      categoryListFuture.then((categoryList) {
         setState(() {
-          this.categoryList = value;
-          this.categoryCount = value.length;
+          this.categoryList = categoryList;
+          this.categoryCount = categoryList.length;
         });
       });
     });

@@ -17,10 +17,6 @@ class _CategoryListState extends State<CategoryList> {
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   Future createAlertDialog(BuildContext context) {
-    if (categoryList == null) {
-      categoryList = List<Category>();
-      updateList();
-    }
     TextEditingController newCategoryName = TextEditingController();
     String newCategoryColour;
     Map returnData = {};
@@ -124,6 +120,10 @@ class _CategoryListState extends State<CategoryList> {
 
   @override
   Widget build(BuildContext context) {
+    if (this.categoryList == null) {
+      this.categoryList = List<Category>();
+      updateList();
+    }
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: bgColorSecondary,
@@ -160,13 +160,13 @@ class _CategoryListState extends State<CategoryList> {
                     child: DropdownButton(
                         dropdownColor: bgColorPrimary,
                         hint: Text(
-                          categoryList[index].categoryColour,
+                          this.categoryList[index].categoryColour,
                           style: TextStyle(
                             color: categoryColorsMap[
-                                categoryList[index].categoryColour],
+                                this.categoryList[index].categoryColour],
                           ),
                         ),
-                        value: categoryList[index].categoryColour,
+                        value: this.categoryList[index].categoryColour,
                         items: categoryColorsList.map((String colour) {
                           return DropdownMenuItem(
                               value: colour,
@@ -178,14 +178,14 @@ class _CategoryListState extends State<CategoryList> {
                               ));
                         }).toList(),
                         onChanged: ((String newColour) {
-                          categoryList[index].categoryColour = newColour;
+                          this.categoryList[index].categoryColour = newColour;
                           saveColourChange(index);
                         })),
                   ),
                   Flexible(
                     child: ListTile(
                       title: Text(
-                        categoryList[index].categoryName,
+                        this.categoryList[index].categoryName,
                         style: TextStyle(color: textColor, fontSize: 24.0),
                       ),
                       trailing: IconButton(
@@ -236,15 +236,16 @@ class _CategoryListState extends State<CategoryList> {
       }
       newName = data['name'];
       newColour = (data['colour'] != '') ? data['colour'] : 'grey';
-      int count = categoryList.length;
+      int count = categoryCount;
       for (int i = 0; i < count; i++) {
-        if (categoryList[i].categoryName == newName) {
+        if (this.categoryList[i].categoryName == newName) {
           showSnackBar(false, "Error, this category already exists.");
           return;
         }
       }
       createCategory(newName, newColour);
     }
+    updateList();
   }
 
   void showSnackBar(bool success, String message) {
@@ -275,7 +276,7 @@ class _CategoryListState extends State<CategoryList> {
 
   void saveColourChange(int index) async {
     //Updates the db of a colour change for categories
-    int result = await databaseHelper.updateCategory(categoryList[index]);
+    int result = await databaseHelper.updateCategory(this.categoryList[index]);
     if (result != 0) {
       showSnackBar(true, "Success. Colour changed.");
     } else {
@@ -285,8 +286,8 @@ class _CategoryListState extends State<CategoryList> {
   }
 
   void deleteCategory(int index) async {
-    int result =
-        await databaseHelper.deleteCategory(categoryList[index].categoryId);
+    int result = await databaseHelper
+        .deleteCategory(this.categoryList[index].categoryId);
     if (result != 0) {
       showSnackBar(true, "Success. Category deleted successfully.");
     } else {
@@ -300,10 +301,10 @@ class _CategoryListState extends State<CategoryList> {
     dbFuture.then((database) {
       Future<List<Category>> categoryListFuture =
           databaseHelper.getCategoryList();
-      categoryListFuture.then((value) {
+      categoryListFuture.then((categoryList) {
         setState(() {
-          this.categoryList = value;
-          this.categoryCount = value.length;
+          this.categoryList = categoryList;
+          this.categoryCount = categoryList.length;
         });
       });
     });

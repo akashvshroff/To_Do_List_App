@@ -150,7 +150,7 @@ class _TaskListState extends State<TaskList> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          editTask('ADD TASK', '', '', 1, 0);
+          editTask('ADD TASK', '', '', 2, 0);
         },
         child: Icon(
           Icons.add,
@@ -245,12 +245,12 @@ class _TaskListState extends State<TaskList> {
         return categoryColorsMap[categoryList[i].categoryColour];
       }
     }
-    return bgColorSecondary;
+    return bgColorPrimary;
   }
 
   void editTask(
       String title, String name, String description, int priority, int category,
-      [int id]) {
+      [int id]) async {
     Map data = {
       'id': id,
       'title': title,
@@ -259,6 +259,8 @@ class _TaskListState extends State<TaskList> {
       'priority': priority,
       'category': category
     };
-    Navigator.pushNamed(context, '/task_detail', arguments: data);
+    var result =
+        await Navigator.pushNamed(context, '/task_detail', arguments: data);
+    updateList();
   }
 }
