@@ -49,7 +49,7 @@ class _TaskListState extends State<TaskList> {
             ),
             dropdownColor: bgColorPrimary,
             value: categoryChoice,
-            items: categoryList?.map((Category instance) {
+            items: this.categoryList?.map((Category instance) {
                   return DropdownMenuItem(
                       value: instance.categoryId,
                       child: Text(
@@ -94,17 +94,17 @@ class _TaskListState extends State<TaskList> {
                   children: [
                     Theme(
                       data: ThemeData(
-                          unselectedWidgetColor:
-                              getActiveColor(taskList[index].taskPriority)),
+                          unselectedWidgetColor: getActiveColor(
+                              this.taskList[index].taskPriority)),
                       child: Checkbox(
-                        value: taskList[index].isChecked, //get from class
+                        value: this.taskList[index].isChecked, //get from class
                         onChanged: (bool value) {
                           setState(() {
-                            taskList[index].isChecked = value;
+                            this.taskList[index].isChecked = value;
                           });
                         },
                         activeColor:
-                            getActiveColor(taskList[index].taskPriority),
+                            getActiveColor(this.taskList[index].taskPriority),
                       ),
                     ),
                     Flexible(
@@ -112,21 +112,21 @@ class _TaskListState extends State<TaskList> {
                         onTap: () {
                           editTask(
                               'EDIT TASK',
-                              taskList[index].taskName,
-                              taskList[index].taskDescription,
-                              taskList[index].taskPriority,
-                              taskList[index].taskCategory,
-                              taskList[index].id);
+                              this.taskList[index].taskName,
+                              this.taskList[index].taskDescription,
+                              this.taskList[index].taskPriority,
+                              this.taskList[index].taskCategory,
+                              this.taskList[index].id);
                         },
                         title: Text(
-                          taskList[index].taskName,
+                          this.taskList[index].taskName,
                           style: TextStyle(
                             color: textColor,
                             fontSize: 20.0,
                           ),
                         ),
                         subtitle: Text(
-                          getCategoryName(taskList[index].taskCategory)
+                          getCategoryName(this.taskList[index].taskCategory)
                               .toUpperCase(), //get category name from db via id
                           style: TextStyle(
                             color: getCategoryColour(taskList[index]
@@ -182,7 +182,7 @@ class _TaskListState extends State<TaskList> {
   }
 
   void deleteTask(int index) async {
-    int result = await databaseHelper.deleteTask(taskList[index].id);
+    int result = await databaseHelper.deleteTask(this.taskList[index].id);
     if (result != 0) {
       showSnackBar(context, 'Success: Task Deleted.', true);
     }
@@ -193,19 +193,19 @@ class _TaskListState extends State<TaskList> {
     Future<Database> dbFuture = databaseHelper.initialiseDatabase();
     dbFuture.then((database) {
       Future<List<Task>> taskListFuture = databaseHelper.getTaskList();
-      taskListFuture.then((tasks) {
+      taskListFuture.then((taskList) {
         setState(() {
-          this.taskList = tasks;
-          this.taskCount = tasks.length;
+          this.taskList = taskList;
+          this.taskCount = taskList.length;
         });
       });
 
       Future<List<Category>> categoryListFuture =
           databaseHelper.getCategoryList();
-      categoryListFuture.then((value) {
+      categoryListFuture.then((categoryList) {
         setState(() {
-          this.categoryList = value;
-          this.categoryCount = value.length;
+          this.categoryList = categoryList;
+          this.categoryCount = categoryList.length;
         });
       });
     });
@@ -214,7 +214,7 @@ class _TaskListState extends State<TaskList> {
   void filterTasks(int category) {
     updateList();
     if (category != 0) {
-      int count = taskList.length;
+      int count = taskCount;
       List<Task> filtered = [];
       for (int i = 0; i < count; i++) {
         if (taskList[i].taskCategory == category) {
@@ -223,13 +223,13 @@ class _TaskListState extends State<TaskList> {
       }
       print(filtered);
       setState(() {
-        taskList = filtered;
+        this.taskList = filtered;
       });
     }
   }
 
   String getCategoryName(int categoryID) {
-    int count = categoryList.length;
+    int count = categoryCount;
     for (int i = 0; i < count; i++) {
       if (categoryList[i].categoryId == categoryID) {
         return categoryList[i].categoryName;
@@ -239,7 +239,7 @@ class _TaskListState extends State<TaskList> {
   }
 
   Color getCategoryColour(int categoryID) {
-    int count = categoryList.length;
+    int count = categoryCount;
     for (int i = 0; i < count; i++) {
       if (categoryList[i].categoryId == categoryID) {
         return categoryColorsMap[categoryList[i].categoryColour];
