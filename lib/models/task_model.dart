@@ -44,20 +44,20 @@ class Task {
     if (id != null) {
       map['id'] = _id;
     }
-    map['taskName'] = _taskName;
-    map['taskDescription'] = _taskDescription;
-    map['taskPriority'] = _taskPriority;
-    map['taskCategory'] = _taskCategory;
-    map['isChecked'] = (_isChecked) ? 1 : 0;
+    map['name'] = _taskName;
+    map['description'] = _taskDescription;
+    map['priority'] = _taskPriority;
+    map['category_id'] = _taskCategory;
+    map['checked'] = (_isChecked) ? 1 : 0;
     return map;
   }
 
   Task.fromMapObject(Map<String, dynamic> map) {
     this._id = map['id'];
-    this._taskName = map['taskName'];
-    this._taskDescription = map['taskDescription'];
-    this._taskPriority = map['taskPriority'];
-    this._taskCategory = map['taskCategory'];
-    this._isChecked = (map['isChecked'] == 1) ? true : false;
+    this._taskName = map['name'];
+    this._taskDescription = map['description'];
+    this._taskPriority = map['priority'];
+    this._taskCategory = map['category_id'];
+    this._isChecked = (map['checked'] == 1) ? true : false;
   }
 }

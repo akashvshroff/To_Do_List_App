@@ -21,16 +21,16 @@ class Category {
   Map<String, dynamic> toMap() {
     var map = Map<String, dynamic>();
     if (categoryId != null) {
-      map['categoryId'] = _categoryId;
+      map['id'] = _categoryId;
     }
-    map['categoryName'] = _categoryName;
-    map['categoryColour'] = _categoryColour;
+    map['name'] = _categoryName;
+    map['colour'] = _categoryColour;
     return map;
   }
 
   Category.fromMapObject(Map<String, dynamic> map) {
-    this._categoryId = map['categoryId'];
-    this._categoryColour = map['categoryColour'];
-    this._categoryName = map['categoryName'];
+    this._categoryId = map['id'];
+    this._categoryColour = map['colour'];
+    this._categoryName = map['name'];
   }
 }
