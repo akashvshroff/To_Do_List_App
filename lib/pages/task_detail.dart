@@ -158,7 +158,7 @@ class _TaskDetailState extends State<TaskDetail> {
                     DropdownButton(
                         hint: Text(
                           'Pick level',
-                          style: TextStyle(fontSize: 16.0, color: textColor),
+                          style: TextStyle(fontSize: 20.0, color: textColor),
                         ),
                         icon: Icon(
                           Icons.arrow_downward,

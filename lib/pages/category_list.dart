@@ -206,7 +206,7 @@ class _CategoryListState extends State<CategoryList> {
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: blueButton,
         onPressed: (() {
-          saveColours();
+          saveColourChange();
           Navigator.pop(context);
         }),
         icon: Icon(
@@ -236,7 +236,7 @@ class _CategoryListState extends State<CategoryList> {
       }
       newName = data['name'];
       newColour = (data['colour'] != '') ? data['colour'] : 'grey';
-      saveCategory(newName, newColour);
+      createCategory(newName, newColour);
       showSnackBar(true, "Success, category added!");
     }
   }
@@ -255,16 +255,17 @@ class _CategoryListState extends State<CategoryList> {
     _scaffoldKey.currentState.showSnackBar(snackbar);
   }
 
-  void createCategories(String categoryName, String categoryColour) {
-    //Creates a new category and adds it to the list
+  void createCategory(String categoryName, String categoryColour) {
+    //Creates a new category and adds it to the db
     print(categoryName);
     print(categoryColour);
 
-    saveColours();
+    saveColourChange();
+    updateCategoryList();
   }
 
-  void saveColours() {
-    //saves all the categories on the list to the db
+  void saveColourChange() {
+    //Updates the db of a colour change for categories
   }
 
   void updateCategoryList() {
@@ -275,6 +276,6 @@ class _CategoryListState extends State<CategoryList> {
     setState(() {
       categoryList.removeAt(index);
     });
-    saveColours();
+    saveColourChange();
   }
 }
