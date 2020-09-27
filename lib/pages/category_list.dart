@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:to_do_app/colours.dart';
 import 'package:to_do_app/models/category_model.dart';
+import 'package:to_do_app/utils/database_helper.dart';
+import 'package:sqflite/sqflite.dart';
 
 class CategoryList extends StatefulWidget {
   @override
@@ -9,11 +11,16 @@ class CategoryList extends StatefulWidget {
 
 class _CategoryListState extends State<CategoryList> {
   List<Category> categoryList;
-  int categoryCount;
+  int categoryCount = 0;
+  DatabaseHelper databaseHelper = DatabaseHelper();
 
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   Future createAlertDialog(BuildContext context) {
+    if (categoryList == null) {
+      categoryList = List<Category>();
+      updateList();
+    }
     TextEditingController newCategoryName = TextEditingController();
     String newCategoryColour;
     Map returnData = {};
@@ -142,7 +149,7 @@ class _CategoryListState extends State<CategoryList> {
       body: Container(
         padding: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 2.0),
         child: ListView.builder(
-          itemCount: categoryList?.length,
+          itemCount: categoryCount,
           itemBuilder: (context, index) {
             return Card(
               color: bgColorPrimary,
@@ -171,9 +178,8 @@ class _CategoryListState extends State<CategoryList> {
                               ));
                         }).toList(),
                         onChanged: ((String newColour) {
-                          setState(() {
-                            categoryList[index].categoryColour = newColour;
-                          });
+                          categoryList[index].categoryColour = newColour;
+                          saveColourChange(index);
                         })),
                   ),
                   Flexible(
@@ -201,7 +207,6 @@ class _CategoryListState extends State<CategoryList> {
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: blueButton,
         onPressed: (() {
-          saveColourChange();
           Navigator.pop(context);
         }),
         icon: Icon(
@@ -209,7 +214,7 @@ class _CategoryListState extends State<CategoryList> {
           color: textColor,
         ),
         label: Text(
-          'SAVE',
+          'DONE',
           style: TextStyle(
             fontSize: 18.0,
             color: textColor,
@@ -226,13 +231,19 @@ class _CategoryListState extends State<CategoryList> {
     Map data = await createAlertDialog(context);
     if (data != null) {
       if (data['name'] == '') {
-        showSnackBar(false, "Error, can't have category without a name!");
+        showSnackBar(false, "Error, can't have category without a name.");
         return;
       }
       newName = data['name'];
       newColour = (data['colour'] != '') ? data['colour'] : 'grey';
+      int count = categoryList.length;
+      for (int i = 0; i < count; i++) {
+        if (categoryList[i].categoryName == newName) {
+          showSnackBar(false, "Error, this category already exists.");
+          return;
+        }
+      }
       createCategory(newName, newColour);
-      showSnackBar(true, "Success, category added!");
     }
   }
 
@@ -250,27 +261,51 @@ class _CategoryListState extends State<CategoryList> {
     _scaffoldKey.currentState.showSnackBar(snackbar);
   }
 
-  void createCategory(String categoryName, String categoryColour) {
+  void createCategory(String categoryName, String categoryColour) async {
     //Creates a new category object and adds it to the db
-    print(categoryName);
-    print(categoryColour);
-
-    saveColourChange();
-    updateCategoryList();
+    Category newCategory = Category(categoryName, categoryColour);
+    int result = await databaseHelper.insertCategory(newCategory);
+    if (result != 0) {
+      showSnackBar(true, "Success. Category added.");
+    } else {
+      showSnackBar(false, "Error. Could not add.");
+    }
+    updateList();
   }
 
-  void saveColourChange() {
+  void saveColourChange(int index) async {
     //Updates the db of a colour change for categories
+    int result = await databaseHelper.updateCategory(categoryList[index]);
+    if (result != 0) {
+      showSnackBar(true, "Success. Colour changed.");
+    } else {
+      showSnackBar(false, "Error. Could not change colour.");
+    }
+    updateList();
   }
 
-  void updateCategoryList() {
-    //gets category list from the db
+  void deleteCategory(int index) async {
+    int result =
+        await databaseHelper.deleteCategory(categoryList[index].categoryId);
+    if (result != 0) {
+      showSnackBar(true, "Success. Category deleted successfully.");
+    } else {
+      showSnackBar(false, "Error. Could not delete category.");
+    }
+    updateList();
   }
 
-  void deleteCategory(int index) {
-    setState(() {
-      categoryList.removeAt(index);
+  void updateList() {
+    Future<Database> dbFuture = databaseHelper.initialiseDatabase();
+    dbFuture.then((database) {
+      Future<List<Category>> categoryListFuture =
+          databaseHelper.getCategoryList();
+      categoryListFuture.then((value) {
+        setState(() {
+          this.categoryList = value;
+          this.categoryCount = value.length;
+        });
+      });
     });
-    saveColourChange();
   }
 }
