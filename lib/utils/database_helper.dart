@@ -52,7 +52,7 @@ class DatabaseHelper {
     $taskChecked INTEGER, $taskPriority INTEGER)
     ''');
     await db.execute(
-        '''CREATE TABLE $categoryTable($categoryId INTEGER PRIMARY KEY AUTOINCREMENT), $categoryName TEXT, $categoryColour TEXT ''');
+        '''CREATE TABLE $categoryTable($categoryId INTEGER PRIMARY KEY AUTOINCREMENT, $categoryName TEXT UNIQUE, $categoryColour TEXT )''');
   }
 
   Future<List<Map<String, dynamic>>> getTaskMapList() async {
