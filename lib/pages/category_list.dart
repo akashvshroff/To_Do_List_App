@@ -16,11 +16,127 @@ class _CategoryListState extends State<CategoryList> {
     Category("Programming", 5, 'indigo'),
   ];
 
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  Future createAlertDialog(BuildContext context) {
+    TextEditingController newCategoryName = TextEditingController();
+    String newCategoryColour;
+    Map returnData = {};
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(builder: (context, setState) {
+            return AlertDialog(
+              title: Text("ADD CATEGORY"),
+              titleTextStyle: TextStyle(color: textColor, fontSize: 24.0),
+              backgroundColor: bgColorSecondary,
+              content: Container(
+                width: 400.0,
+                height: 100.0,
+                child: Column(
+                  children: [
+                    SizedBox(
+                      child: TextField(
+                          controller: newCategoryName,
+                          showCursor: false,
+                          style: TextStyle(fontSize: 20.0, color: textColor),
+                          decoration: InputDecoration(
+                            hintText: "Category Name",
+                            hintStyle:
+                                TextStyle(color: textColor, fontSize: 18.0),
+                            fillColor: bgColorPrimary,
+                            filled: true,
+                          )),
+                    ),
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: 10.0,
+                        ),
+                        Text(
+                          'Pick Colour',
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 18.0,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 30.0,
+                        ),
+                        DropdownButton(
+                          dropdownColor: bgColorPrimary,
+                          icon: Icon(Icons.colorize),
+                          hint: Text(
+                            'Colour',
+                            style: TextStyle(
+                              color: textColor,
+                              fontSize: 18.0,
+                            ),
+                          ),
+                          value: newCategoryColour,
+                          items: categoryColorsList.map(
+                            (colour) {
+                              return DropdownMenuItem(
+                                  value: colour,
+                                  child: Text(
+                                    colour,
+                                    style: TextStyle(
+                                      color: categoryColorsMap[colour],
+                                      fontSize: 20.0,
+                                    ),
+                                  ));
+                            },
+                          ).toList(),
+                          onChanged: (newValue) {
+                            setState(() {
+                              newCategoryColour = newValue;
+                            });
+                          },
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+              actions: [
+                RaisedButton.icon(
+                    color: blueButton,
+                    onPressed: () {
+                      returnData['name'] = newCategoryName.text.toString();
+                      returnData['colour'] = newCategoryColour;
+                      Navigator.pop(context, returnData);
+                    },
+                    icon: Icon(
+                      Icons.check,
+                      color: textColor,
+                    ),
+                    label: Text(
+                      "ADD",
+                      style: TextStyle(color: textColor, fontSize: 18.0),
+                    )),
+              ],
+            );
+          });
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: bgColorSecondary,
       appBar: AppBar(
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.add,
+              color: textColor,
+            ),
+            onPressed: () {
+              addNewCategory();
+            },
+          ),
+        ],
         backgroundColor: bgColorPrimary,
         title: Text(
           'Edit Categories'.toUpperCase(),
@@ -40,6 +156,7 @@ class _CategoryListState extends State<CategoryList> {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(10.0, 0, 0, 0),
                     child: DropdownButton(
+                        dropdownColor: bgColorPrimary,
                         hint: Text(
                           categoryList[index].categoryColour,
                           style: TextStyle(
@@ -59,7 +176,9 @@ class _CategoryListState extends State<CategoryList> {
                               ));
                         }).toList(),
                         onChanged: ((String newColour) {
-                          categoryList[index].categoryColour = newColour;
+                          setState(() {
+                            categoryList[index].categoryColour = newColour;
+                          });
                         })),
                   ),
                   Flexible(
@@ -104,6 +223,42 @@ class _CategoryListState extends State<CategoryList> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
+  }
+
+  void addNewCategory() async {
+    String newName;
+    String newColour;
+    Map data = await createAlertDialog(context);
+    if (data != null) {
+      if (data['name'] == '') {
+        showSnackBar(false, "Error, can't have category without a name!");
+        return;
+      }
+      newName = data['name'];
+      newColour = (data['colour'] != '') ? data['colour'] : 'grey';
+      saveCategory(newName, newColour);
+      showSnackBar(true, "Success, category added!");
+    }
+  }
+
+  void showSnackBar(bool success, String message) {
+    Color snackbarColour = success ? greenButton : redButton;
+    final snackbar = SnackBar(
+        backgroundColor: bgColorPrimary,
+        action: SnackBarAction(
+            label: 'OK',
+            onPressed: () {
+              _scaffoldKey.currentState.hideCurrentSnackBar();
+            }),
+        content: Text(message,
+            style: TextStyle(color: snackbarColour, fontSize: 20.0)));
+    _scaffoldKey.currentState.showSnackBar(snackbar);
+  }
+
+  void saveCategory(String categoryName, String categoryColour) {
+    //saves a newly added category - have to check name matching
+    print(categoryName);
+    print(categoryColour);
   }
 
   void saveColours() {
