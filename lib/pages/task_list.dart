@@ -83,7 +83,15 @@ class _TaskListState extends State<TaskList> {
               });
             },
             color: textColor,
-          )
+          ),
+          IconButton(
+              icon: Icon(
+                Icons.category,
+                color: textColor,
+              ),
+              onPressed: () {
+                editCategories();
+              })
         ],
       ),
       body: Padding(
@@ -236,7 +244,7 @@ class _TaskListState extends State<TaskList> {
   }
 
   void filterTasks(String category) async {
-    updateList();
+    await updateList();
     if (category != '') {
       int filteredId = await getCategoryId(category);
       List<Task> filtered = [];
@@ -252,10 +260,9 @@ class _TaskListState extends State<TaskList> {
           categoryChoice = null;
         });
       } else {
-        setState(() {
-          this.taskList = filtered;
-        });
+        this.taskList = filtered;
         this.taskCount = this.taskList.length;
+        setState(() {});
       }
     }
   }
@@ -278,6 +285,11 @@ class _TaskListState extends State<TaskList> {
       }
     }
     return bgColorPrimary;
+  }
+
+  void editCategories() async {
+    var result = Navigator.pushNamed(context, '/category_list');
+    updateList();
   }
 
   void editTask(String title, String name, String description, String priority,

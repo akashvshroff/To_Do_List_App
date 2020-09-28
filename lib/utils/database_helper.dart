@@ -98,7 +98,7 @@ class DatabaseHelper {
         .query(categoryTable, where: '$categoryId = ?', whereArgs: [id]);
     String result;
     x.forEach((element) {
-      result = element[categoryId];
+      result = element[categoryName];
     });
     return result;
   }

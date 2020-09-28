@@ -112,7 +112,7 @@ class _TaskDetailState extends State<TaskDetail> {
                                   style: TextStyle(
                                       color: getCategoryColour(
                                           instance.categoryId),
-                                      fontSize: 20.0),
+                                      fontSize: 22.0),
                                 ));
                           })?.toList() ??
                           [],
