@@ -52,7 +52,7 @@ class _TaskDetailState extends State<TaskDetail> {
               Flexible(
                 child: TextField(
                     showCursor: false,
-                    style: TextStyle(color: textColor, fontSize: 24.0),
+                    style: TextStyle(color: textColor, fontSize: 22.0),
                     controller: taskName,
                     decoration: InputDecoration(
                       hintText: "Task Name",
@@ -67,7 +67,7 @@ class _TaskDetailState extends State<TaskDetail> {
               Flexible(
                 child: TextField(
                     showCursor: false,
-                    style: TextStyle(color: textColor, fontSize: 24.0),
+                    style: TextStyle(color: textColor, fontSize: 20.0),
                     controller: taskDescription,
                     maxLines: 3,
                     textAlignVertical: TextAlignVertical.center,

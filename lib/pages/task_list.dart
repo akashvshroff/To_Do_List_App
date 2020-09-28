@@ -132,7 +132,7 @@ class _TaskListState extends State<TaskList> {
                           this.taskList[index].taskName,
                           style: TextStyle(
                             color: textColor,
-                            fontSize: 20.0,
+                            fontSize: 19.0,
                           ),
                         ),
                         subtitle: Text(
