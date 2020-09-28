@@ -62,9 +62,6 @@ class _TaskListState extends State<TaskList> {
                 [],
             onChanged: (newValue) {
               filterTasks(newValue);
-              setState(() {
-                categoryChoice = newValue;
-              });
             },
             icon: Icon(
               Icons.filter_list,
@@ -78,9 +75,6 @@ class _TaskListState extends State<TaskList> {
             ),
             onPressed: () {
               filterTasks('');
-              setState(() {
-                categoryChoice = null;
-              });
             },
             color: textColor,
           ),
@@ -260,10 +254,16 @@ class _TaskListState extends State<TaskList> {
           categoryChoice = null;
         });
       } else {
-        this.taskList = filtered;
-        this.taskCount = this.taskList.length;
-        setState(() {});
+        setState(() {
+          this.taskList = filtered;
+          this.taskCount = this.taskList.length;
+          categoryChoice = category;
+        });
       }
+    } else {
+      setState(() {
+        categoryChoice = null;
+      });
     }
   }
 
