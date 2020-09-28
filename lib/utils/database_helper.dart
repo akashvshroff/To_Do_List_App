@@ -40,16 +40,10 @@ class DatabaseHelper {
 
   Future<Database> initialiseDatabase() async {
     Directory directory = await getApplicationDocumentsDirectory();
-    String path = directory.path + 'tasks.db';
+    String path = directory.path + 'todo.db';
     var tasksDatabase =
         await openDatabase(path, version: 1, onCreate: _createDb);
     return tasksDatabase;
-  }
-
-  void dropTable() async {
-    Database db = await this.database;
-    await db.execute('DROP TABLE IF EXISTS $taskTable');
-    await db.execute('DROP TABLE IF EXISTS $taskTable');
   }
 
   void _createDb(Database db, int newVersion) async {
@@ -64,7 +58,7 @@ class DatabaseHelper {
   Future<List<Map<String, dynamic>>> getTaskMapList() async {
     Database db = await this.database;
     var result = await db
-        .rawQuery('SELECT * FROM $taskTable ORDER BY $taskPriority ASC');
+        .rawQuery('SELECT * FROM $taskTable ORDER BY $taskPriority DESC');
     return result;
   }
 
@@ -89,12 +83,9 @@ class DatabaseHelper {
 
   Future<int> getCategoryId(String name) async {
     Database db = await this.database;
-    var y = await db.rawQuery('SELECT * FROM $categoryTable');
-    print(y);
-    var x = await db.rawQuery(
-        'SELECT $categoryId FROM $categoryTable WHERE $categoryName = $name');
+    var x = await db
+        .query(categoryTable, where: '$categoryName = ?', whereArgs: [name]);
     int result;
-    print(x);
     x.forEach((element) {
       result = element[categoryId];
     });
@@ -103,10 +94,9 @@ class DatabaseHelper {
 
   Future<String> getCategoryName(int id) async {
     Database db = await this.database;
-    var x = await db.rawQuery(
-        'SELECT $categoryName FROM $categoryTable WHERE $categoryId = $id');
+    var x = await db
+        .query(categoryTable, where: '$categoryId = ?', whereArgs: [id]);
     String result;
-    print(x);
     x.forEach((element) {
       result = element[categoryId];
     });
