@@ -61,10 +61,10 @@ class _TaskListState extends State<TaskList> {
                 })?.toList() ??
                 [],
             onChanged: (newValue) {
+              filterTasks(newValue);
               setState(() {
                 categoryChoice = newValue;
               });
-              filterTasks(newValue);
             },
             icon: Icon(
               Icons.filter_list,
@@ -78,6 +78,9 @@ class _TaskListState extends State<TaskList> {
             ),
             onPressed: () {
               filterTasks('');
+              setState(() {
+                categoryChoice = null;
+              });
             },
             color: textColor,
           )
@@ -86,7 +89,7 @@ class _TaskListState extends State<TaskList> {
       body: Padding(
         padding: EdgeInsets.fromLTRB(0, 4.0, 0, 0),
         child: ListView.builder(
-          itemCount: taskCount,
+          itemCount: this.taskCount,
           itemBuilder: (context, index) {
             return Padding(
               padding:
@@ -104,6 +107,7 @@ class _TaskListState extends State<TaskList> {
                         onChanged: (bool value) {
                           setState(() {
                             this.taskList[index].isChecked = value;
+                            updateChecked(index);
                           });
                         },
                         activeColor:
@@ -113,7 +117,8 @@ class _TaskListState extends State<TaskList> {
                     Flexible(
                       child: ListTile(
                         onTap: () async {
-                          String name = await getCategoryNameDb(
+                          String name = '';
+                          name = await getCategoryNameDb(
                               this.taskList[index].taskCategory);
                           editTask(
                               'EDIT TASK',
@@ -194,6 +199,10 @@ class _TaskListState extends State<TaskList> {
     updateList();
   }
 
+  void updateChecked(int index) async {
+    int result = await databaseHelper.updateTask(this.taskList[index]);
+  }
+
   void updateList() {
     Future<Database> dbFuture = databaseHelper.initialiseDatabase();
     dbFuture.then((database) {
@@ -237,9 +246,17 @@ class _TaskListState extends State<TaskList> {
           filtered.add(this.taskList[i]);
         }
       }
-      setState(() {
-        this.taskList = filtered;
-      });
+      if (filtered.isEmpty) {
+        showSnackBar(context, "Error, no tasks of this category exist.", false);
+        setState(() {
+          categoryChoice = null;
+        });
+      } else {
+        setState(() {
+          this.taskList = filtered;
+        });
+        this.taskCount = this.taskList.length;
+      }
     }
   }
 
