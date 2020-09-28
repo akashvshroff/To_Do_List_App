@@ -46,10 +46,16 @@ class DatabaseHelper {
     return tasksDatabase;
   }
 
+  void dropTable() async {
+    Database db = await this.database;
+    await db.execute('DROP TABLE IF EXISTS $taskTable');
+    await db.execute('DROP TABLE IF EXISTS $taskTable');
+  }
+
   void _createDb(Database db, int newVersion) async {
     await db.execute(''' 
     CREATE TABLE $taskTable($taskId INTEGER PRIMARY KEY AUTOINCREMENT, $taskName TEXT, $taskDescription TEXT, $taskCategory INTEGER,
-    $taskChecked INTEGER, $taskPriority INTEGER)
+    $taskChecked INTEGER, $taskPriority STRING)
     ''');
     await db.execute(
         '''CREATE TABLE $categoryTable($categoryId INTEGER PRIMARY KEY AUTOINCREMENT, $categoryName TEXT UNIQUE, $categoryColour TEXT )''');
@@ -83,9 +89,24 @@ class DatabaseHelper {
 
   Future<int> getCategoryId(String name) async {
     Database db = await this.database;
+    var y = await db.rawQuery('SELECT * FROM $categoryTable');
+    print(y);
     var x = await db.rawQuery(
         'SELECT $categoryId FROM $categoryTable WHERE $categoryName = $name');
     int result;
+    print(x);
+    x.forEach((element) {
+      result = element[categoryId];
+    });
+    return result;
+  }
+
+  Future<String> getCategoryName(int id) async {
+    Database db = await this.database;
+    var x = await db.rawQuery(
+        'SELECT $categoryName FROM $categoryTable WHERE $categoryId = $id');
+    String result;
+    print(x);
     x.forEach((element) {
       result = element[categoryId];
     });

@@ -3,7 +3,7 @@ class Task {
   String _taskName;
   String _taskDescription;
   int _taskCategory;
-  int _taskPriority;
+  String _taskPriority;
   bool _isChecked;
 
   Task(this._taskName, this._taskDescription, this._taskPriority,
@@ -16,7 +16,7 @@ class Task {
   String get taskName => _taskName;
   String get taskDescription => _taskDescription;
   int get taskCategory => _taskCategory;
-  int get taskPriority => _taskPriority;
+  String get taskPriority => _taskPriority;
   bool get isChecked => _isChecked;
 
   set taskName(String newName) {
@@ -31,7 +31,7 @@ class Task {
     this._taskDescription = newDescription;
   }
 
-  set taskPriority(int newPriority) {
+  set taskPriority(String newPriority) {
     this._taskPriority = newPriority;
   }
 
