@@ -17,14 +17,14 @@ class _TaskDetailState extends State<TaskDetail> {
   TextEditingController taskDescription = TextEditingController();
   List<Category> categoryList;
   int categoryCount = 0;
-  String categoryChoice;
-  String priorityLevel;
+  String categoryChoice = '';
+  String priorityLevel = '';
   List<String> taskPriorities = ["Normal", "Urgent"];
 
   @override
   Widget build(BuildContext context) {
     if (categoryList == null) {
-      categoryList = List<Category>();
+      this.categoryList = List<Category>();
       updateList();
     }
     data = ModalRoute.of(context).settings.arguments;
@@ -32,8 +32,8 @@ class _TaskDetailState extends State<TaskDetail> {
     taskDescription.text = (taskDescription.text == '')
         ? data['description']
         : taskDescription.text;
-    priorityLevel = data['priority'];
-    categoryChoice = data['category'];
+    priorityLevel = priorityLevel == '' ? data['priority'] : priorityLevel;
+    categoryChoice = categoryChoice == '' ? data['category'] : categoryChoice;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: bgColorSecondary,
@@ -85,6 +85,7 @@ class _TaskDetailState extends State<TaskDetail> {
                 height: 100,
                 color: bgColorPrimary,
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Padding(
                       padding: const EdgeInsets.fromLTRB(10.0, 0, 10.0, 0),
@@ -94,20 +95,18 @@ class _TaskDetailState extends State<TaskDetail> {
                       ),
                     ),
                     SizedBox(
-                      width: 20.0,
+                      width: 5.0,
                     ),
                     DropdownButton(
                       hint: Text(
-                        getCategoryName(data['category']),
-                        style: TextStyle(
-                            fontSize: 20.0,
-                            color: getCategoryColour(data['category'])),
+                        'Category',
+                        style: TextStyle(fontSize: 20.0, color: textColor),
                       ),
                       dropdownColor: bgColorPrimary,
                       value: categoryChoice,
                       items: this.categoryList?.map((Category instance) {
                             return DropdownMenuItem(
-                                value: instance.categoryId,
+                                value: instance.categoryName.toString(),
                                 child: Text(
                                   instance.categoryName,
                                   style: TextStyle(
@@ -237,9 +236,8 @@ class _TaskDetailState extends State<TaskDetail> {
     }
   }
 
-  void moveToPrev() async {
-    var result = await Navigator.pop(context);
-    updateList();
+  void moveToPrev() {
+    Navigator.pop(context);
   }
 
   void showAlertDialog(String title, String message) {
@@ -256,7 +254,6 @@ class _TaskDetailState extends State<TaskDetail> {
   }
 
   void saveTask() async {
-    moveToPrev();
     int result;
     int categoryId = await getCategoryId(categoryChoice);
     if (data['id'] != null) {
@@ -269,6 +266,7 @@ class _TaskDetailState extends State<TaskDetail> {
           taskDescription.text.toString(), priorityLevel, categoryId, false);
       result = await databaseHelper.insertTask(newTask);
     }
+    moveToPrev();
     if (result != 0) {
       showAlertDialog("Success", "Task saved successfully.");
     } else {
@@ -285,19 +283,12 @@ class _TaskDetailState extends State<TaskDetail> {
         setState(() {
           this.categoryList = categoryList;
           this.categoryCount = categoryList.length;
+          if (this.categoryList != [] && categoryChoice == '') {
+            categoryChoice = this.categoryList[0].categoryName;
+          }
         });
       });
     });
-  }
-
-  String getCategoryName(int categoryID) {
-    int count = categoryCount;
-    for (int i = 0; i < count; i++) {
-      if (categoryList[i].categoryId == categoryID) {
-        return categoryList[i].categoryName;
-      }
-    }
-    return 'Default';
   }
 
   Color getCategoryColour(int categoryID) {
@@ -310,8 +301,9 @@ class _TaskDetailState extends State<TaskDetail> {
     return textColor;
   }
 
-  void categoryScreen() {
-    Navigator.pushNamed(context, '/category_list');
+  void categoryScreen() async {
+    var result = await Navigator.pushNamed(context, '/category_list');
+    updateList();
   }
 
   Future<int> getCategoryId(String category) async {
