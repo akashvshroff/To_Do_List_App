@@ -208,7 +208,9 @@ class _TaskDetailState extends State<TaskDetail> {
                 RaisedButton(
                   padding:
                       EdgeInsets.symmetric(horizontal: 40.0, vertical: 20.0),
-                  onPressed: () {},
+                  onPressed: () {
+                    deleteTask();
+                  },
                   child: Text(
                     "DELETE",
                     style: TextStyle(fontSize: 24.0, color: textColor),
@@ -222,13 +224,11 @@ class _TaskDetailState extends State<TaskDetail> {
   }
 
   void deleteTask() async {
-    moveToPrev();
     if (data['id'] == null) {
-      showAlertDialog("Status", "No task was deleted.");
-      return;
+      moveToPrev();
     }
-
     int result = await databaseHelper.deleteTask(data['id']);
+    moveToPrev();
     if (result != 0) {
       showAlertDialog("Success", "Note deleted succesfully.");
     } else {

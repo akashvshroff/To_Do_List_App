@@ -118,17 +118,8 @@ class _TaskListState extends State<TaskList> {
                     ),
                     Flexible(
                       child: ListTile(
-                        onTap: () async {
-                          String name = '';
-                          name = await getCategoryNameDb(
-                              this.taskList[index].taskCategory);
-                          editTask(
-                              'EDIT TASK',
-                              this.taskList[index].taskName,
-                              this.taskList[index].taskDescription,
-                              this.taskList[index].taskPriority,
-                              name,
-                              this.taskList[index].id);
+                        onTap: () {
+                          editSpecificTask(index);
                         },
                         title: Text(
                           this.taskList[index].taskName,
@@ -171,6 +162,18 @@ class _TaskListState extends State<TaskList> {
         backgroundColor: blueButton,
       ),
     );
+  }
+
+  void editSpecificTask(index) async {
+    String name = '';
+    name = await getCategoryNameDb(this.taskList[index].taskCategory);
+    editTask(
+        'EDIT TASK',
+        this.taskList[index].taskName,
+        this.taskList[index].taskDescription,
+        this.taskList[index].taskPriority,
+        name,
+        this.taskList[index].id);
   }
 
   void showSnackBar(BuildContext context, String message, bool success) {
@@ -239,6 +242,7 @@ class _TaskListState extends State<TaskList> {
 
   void filterTasks(String category) async {
     await updateList();
+
     if (category != '') {
       int filteredId = await getCategoryId(category);
       List<Task> filtered = [];
@@ -256,7 +260,7 @@ class _TaskListState extends State<TaskList> {
       } else {
         setState(() {
           this.taskList = filtered;
-          this.taskCount = this.taskList.length;
+          this.taskCount = taskList.length;
           categoryChoice = category;
         });
       }
@@ -288,7 +292,7 @@ class _TaskListState extends State<TaskList> {
   }
 
   void editCategories() async {
-    var result = Navigator.pushNamed(context, '/category_list');
+    var result = await Navigator.pushNamed(context, '/category_list');
     updateList();
   }
 
