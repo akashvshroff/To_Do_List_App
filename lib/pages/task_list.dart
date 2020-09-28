@@ -16,7 +16,7 @@ class _TaskListState extends State<TaskList> {
   int taskCount = 0;
   List<Category> categoryList;
   int categoryCount = 0;
-  int categoryChoice;
+  String categoryChoice;
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -51,7 +51,7 @@ class _TaskListState extends State<TaskList> {
             value: categoryChoice,
             items: this.categoryList?.map((Category instance) {
                   return DropdownMenuItem(
-                      value: instance.categoryId,
+                      value: instance.categoryName,
                       child: Text(
                         instance.categoryName,
                         style: TextStyle(
@@ -61,6 +61,9 @@ class _TaskListState extends State<TaskList> {
                 })?.toList() ??
                 [],
             onChanged: (newValue) {
+              setState(() {
+                categoryChoice = newValue;
+              });
               filterTasks(newValue);
             },
             icon: Icon(
@@ -74,7 +77,7 @@ class _TaskListState extends State<TaskList> {
               color: textColor,
             ),
             onPressed: () {
-              filterTasks(0);
+              filterTasks('');
             },
             color: textColor,
           )
@@ -109,13 +112,15 @@ class _TaskListState extends State<TaskList> {
                     ),
                     Flexible(
                       child: ListTile(
-                        onTap: () {
+                        onTap: () async {
+                          String name = await getCategoryNameDb(
+                              this.taskList[index].taskCategory);
                           editTask(
                               'EDIT TASK',
                               this.taskList[index].taskName,
                               this.taskList[index].taskDescription,
                               this.taskList[index].taskPriority,
-                              this.taskList[index].taskCategory,
+                              name,
                               this.taskList[index].id);
                         },
                         title: Text(
@@ -150,7 +155,7 @@ class _TaskListState extends State<TaskList> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          editTask('ADD TASK', '', '', 2, 0);
+          editTask('ADD TASK', '', '', 'Normal', '');
         },
         child: Icon(
           Icons.add,
@@ -175,9 +180,9 @@ class _TaskListState extends State<TaskList> {
     _scaffoldKey.currentState.showSnackBar(snackbar);
   }
 
-  Color getActiveColor(int priority) {
+  Color getActiveColor(String priority) {
     Color colourDisplay;
-    colourDisplay = (priority == 1) ? blueButton : redButton;
+    colourDisplay = (priority == 'Normal') ? blueButton : redButton;
     return colourDisplay;
   }
 
@@ -211,17 +216,27 @@ class _TaskListState extends State<TaskList> {
     });
   }
 
-  void filterTasks(int category) {
+  Future<String> getCategoryNameDb(int id) async {
+    String categoryName = await databaseHelper.getCategoryName(id);
+    return categoryName;
+  }
+
+  Future<int> getCategoryId(String category) async {
+    int categoryId = await databaseHelper.getCategoryId(category);
+    return categoryId;
+  }
+
+  void filterTasks(String category) async {
     updateList();
-    if (category != 0) {
-      int count = taskCount;
+    if (category != '') {
+      int filteredId = await getCategoryId(category);
       List<Task> filtered = [];
+      int count = taskCount;
       for (int i = 0; i < count; i++) {
-        if (taskList[i].taskCategory == category) {
-          filtered.add(taskList[i]);
+        if (this.taskList[i].taskCategory == filteredId) {
+          filtered.add(this.taskList[i]);
         }
       }
-      print(filtered);
       setState(() {
         this.taskList = filtered;
       });
@@ -248,8 +263,8 @@ class _TaskListState extends State<TaskList> {
     return bgColorPrimary;
   }
 
-  void editTask(
-      String title, String name, String description, int priority, int category,
+  void editTask(String title, String name, String description, String priority,
+      String category,
       [int id]) async {
     Map data = {
       'id': id,

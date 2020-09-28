@@ -17,8 +17,8 @@ class _TaskDetailState extends State<TaskDetail> {
   TextEditingController taskDescription = TextEditingController();
   List<Category> categoryList;
   int categoryCount = 0;
-  int categoryChoice;
-  int priorityLevel;
+  String categoryChoice;
+  String priorityLevel;
   List<String> taskPriorities = ["Normal", "Urgent"];
 
   @override
@@ -175,14 +175,14 @@ class _TaskDetailState extends State<TaskDetail> {
                         value: priorityLevel,
                         items: taskPriorities.map((priority) {
                           return DropdownMenuItem(
-                            value: getPriorityLevel(priority),
+                            value: priority,
                             child: Text(priority,
                                 style: TextStyle(
                                     fontSize: 24.0,
                                     color: getPriorityColour(priority))),
                           );
                         }).toList(),
-                        onChanged: ((int newValue) {
+                        onChanged: ((String newValue) {
                           setState(() {
                             priorityLevel = newValue;
                           });
@@ -258,23 +258,15 @@ class _TaskDetailState extends State<TaskDetail> {
   void saveTask() async {
     moveToPrev();
     int result;
+    int categoryId = await getCategoryId(categoryChoice);
     if (data['id'] != null) {
       //updating a task
-      Task newTask = Task.withId(
-          data['id'],
-          taskName.text.toString(),
-          taskDescription.text.toString(),
-          priorityLevel,
-          categoryChoice,
-          false);
+      Task newTask = Task.withId(data['id'], taskName.text.toString(),
+          taskDescription.text.toString(), priorityLevel, categoryId, false);
       result = await databaseHelper.updateTask(newTask);
     } else {
-      Task newTask = Task(
-          taskName.text.toString(),
-          taskDescription.text.toString(),
-          priorityLevel,
-          categoryChoice,
-          false);
+      Task newTask = Task(taskName.text.toString(),
+          taskDescription.text.toString(), priorityLevel, categoryId, false);
       result = await databaseHelper.insertTask(newTask);
     }
     if (result != 0) {
@@ -320,6 +312,11 @@ class _TaskDetailState extends State<TaskDetail> {
 
   void categoryScreen() {
     Navigator.pushNamed(context, '/category_list');
+  }
+
+  Future<int> getCategoryId(String category) async {
+    int categoryId = await databaseHelper.getCategoryId(category);
+    return categoryId;
   }
 
   int getPriorityLevel(String priority) {
