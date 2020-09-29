@@ -51,9 +51,9 @@ class _TaskDetailState extends State<TaskDetail> {
             children: [
               Flexible(
                 child: TextField(
-                    showCursor: false,
                     style: TextStyle(color: textColor, fontSize: 22.0),
                     controller: taskName,
+                    maxLines: null,
                     decoration: InputDecoration(
                       hintText: "Task Name",
                       hintStyle: TextStyle(color: textColor, fontSize: 18.0),
@@ -66,7 +66,6 @@ class _TaskDetailState extends State<TaskDetail> {
               ),
               Flexible(
                 child: TextField(
-                    showCursor: false,
                     style: TextStyle(color: textColor, fontSize: 20.0),
                     controller: taskDescription,
                     maxLines: 3,
@@ -226,6 +225,7 @@ class _TaskDetailState extends State<TaskDetail> {
   void deleteTask() async {
     if (data['id'] == null) {
       moveToPrev();
+      return;
     }
     int result = await databaseHelper.deleteTask(data['id']);
     moveToPrev();
