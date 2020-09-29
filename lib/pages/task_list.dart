@@ -208,25 +208,15 @@ class _TaskListState extends State<TaskList> {
     int result = await databaseHelper.updateTask(this.taskList[index]);
   }
 
-  void updateList() {
-    Future<Database> dbFuture = databaseHelper.initialiseDatabase();
-    dbFuture.then((database) {
-      Future<List<Task>> taskListFuture = databaseHelper.getTaskList();
-      taskListFuture.then((taskList) {
-        setState(() {
-          this.taskList = taskList;
-          this.taskCount = taskList.length;
-        });
-      });
-
-      Future<List<Category>> categoryListFuture =
-          databaseHelper.getCategoryList();
-      categoryListFuture.then((categoryList) {
-        setState(() {
-          this.categoryList = categoryList;
-          this.categoryCount = categoryList.length;
-        });
-      });
+  void updateList() async {
+    Database db = await databaseHelper.initialiseDatabase();
+    List<Task> taskTemp = await databaseHelper.getTaskList();
+    List<Category> categoryTemp = await databaseHelper.getCategoryList();
+    setState(() {
+      this.taskList = taskTemp;
+      this.taskCount = taskTemp.length;
+      this.categoryList = categoryTemp;
+      this.categoryCount = categoryTemp.length;
     });
   }
 
