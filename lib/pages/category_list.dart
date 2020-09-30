@@ -17,6 +17,7 @@ class _CategoryListState extends State<CategoryList> {
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   Future createAlertDialog(BuildContext context) {
+    //dialog box for adding a category
     TextEditingController newCategoryName = TextEditingController();
     String newCategoryColour;
     Map returnData = {};
@@ -226,6 +227,7 @@ class _CategoryListState extends State<CategoryList> {
   }
 
   void addNewCategory() async {
+    //saves new category to db
     String newName;
     String newColour;
     Map data = await createAlertDialog(context);
@@ -297,6 +299,7 @@ class _CategoryListState extends State<CategoryList> {
   }
 
   void updateList() {
+    //updates category list from db
     Future<Database> dbFuture = databaseHelper.initialiseDatabase();
     dbFuture.then((database) {
       Future<List<Category>> categoryListFuture =

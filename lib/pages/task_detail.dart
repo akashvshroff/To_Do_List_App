@@ -223,6 +223,7 @@ class _TaskDetailState extends State<TaskDetail> {
   }
 
   void deleteTask() async {
+    //removes task and validates
     if (data['id'] == null) {
       moveToPrev();
       return;
@@ -254,6 +255,7 @@ class _TaskDetailState extends State<TaskDetail> {
   }
 
   void saveTask() async {
+    //saves a task, checks update or new
     int result;
     int categoryId = await getCategoryId(categoryChoice);
     if (data['id'] != null) {
@@ -275,6 +277,7 @@ class _TaskDetailState extends State<TaskDetail> {
   }
 
   void updateList() {
+    //fetches from db
     Future<Database> dbFuture = databaseHelper.initialiseDatabase();
     dbFuture.then((database) {
       Future<List<Category>> categoryListFuture =
@@ -292,6 +295,7 @@ class _TaskDetailState extends State<TaskDetail> {
   }
 
   Color getCategoryColour(int categoryID) {
+    //gets the category colour
     int count = categoryCount;
     for (int i = 0; i < count; i++) {
       if (categoryList[i].categoryId == categoryID) {
