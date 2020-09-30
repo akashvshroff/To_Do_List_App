@@ -12,11 +12,11 @@ class TaskList extends StatefulWidget {
 
 class _TaskListState extends State<TaskList> {
   DatabaseHelper databaseHelper = DatabaseHelper();
-  List<Task> taskList;
+  List<Task> taskList; //list of all the tasks
   int taskCount = 0;
-  List<Category> categoryList;
+  List<Category> categoryList; //list of all the categories
   int categoryCount = 0;
-  String categoryChoice;
+  String categoryChoice; //category choice for filtering
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -24,7 +24,7 @@ class _TaskListState extends State<TaskList> {
     if (taskList == null || categoryList == null) {
       taskList = List<Task>();
       categoryList = List<Category>();
-      updateList();
+      updateList(); //retrieves tasks and categories from db and rebuilds
     }
     return Scaffold(
       key: _scaffoldKey,
@@ -165,6 +165,7 @@ class _TaskListState extends State<TaskList> {
   }
 
   void editSpecificTask(index) async {
+    //clicking on a task to edit
     String name = '';
     name = await getCategoryNameDb(this.taskList[index].taskCategory);
     editTask(
@@ -191,12 +192,14 @@ class _TaskListState extends State<TaskList> {
   }
 
   Color getActiveColor(String priority) {
+    //colour of priority
     Color colourDisplay;
     colourDisplay = (priority == 'Normal') ? blueButton : redButton;
     return colourDisplay;
   }
 
   void deleteTask(int index) async {
+    //remove a task from list
     int result = await databaseHelper.deleteTask(this.taskList[index].id);
     if (result != 0) {
       showSnackBar(context, 'Success: Task Deleted.', true);
@@ -205,10 +208,12 @@ class _TaskListState extends State<TaskList> {
   }
 
   void updateChecked(int index) async {
+    //checkbox updating and saving
     int result = await databaseHelper.updateTask(this.taskList[index]);
   }
 
   void updateList() async {
+    //retrieves info from db
     Database db = await databaseHelper.initialiseDatabase();
     List<Task> taskTemp = await databaseHelper.getTaskList();
     List<Category> categoryTemp = await databaseHelper.getCategoryList();
@@ -231,7 +236,8 @@ class _TaskListState extends State<TaskList> {
   }
 
   void filterTasks(String category) async {
-    await updateList();
+    //filters a task based on category
+    await updateList(); //resets list
 
     if (category != '') {
       int filteredId = await getCategoryId(category);
@@ -262,6 +268,7 @@ class _TaskListState extends State<TaskList> {
   }
 
   String getCategoryName(int categoryID) {
+    //category name for texts, duplicate since not async
     int count = categoryCount;
     for (int i = 0; i < count; i++) {
       if (categoryList[i].categoryId == categoryID) {
@@ -282,6 +289,7 @@ class _TaskListState extends State<TaskList> {
   }
 
   void editCategories() async {
+    //pushes third page and resets list
     var result = await Navigator.pushNamed(context, '/category_list');
     updateList();
   }
@@ -289,6 +297,7 @@ class _TaskListState extends State<TaskList> {
   void editTask(String title, String name, String description, String priority,
       String category,
       [int id]) async {
+    //pushes second page and passes parameters
     Map data = {
       'id': id,
       'title': title,
