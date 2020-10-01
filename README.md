@@ -2,7 +2,7 @@
 
 - A clean, dark, minimal to-do list app that allows users to categorize tasks by colour-coded categories and a priority level. The app removes any distractions and only shows the users what is truly important. The app is built using Flutter and data is persisted using SQL (via sqflite).
 
-##INSERT VIDEO LINK HERE
+<iframe width="560" height="315" src="https://www.youtube.com/embed/isH1_ZWqrNk" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 - A detailed description of the different features of the application - how they were implemented - as well as a full layout of the app and its routing can be found in the description section down below.
 
