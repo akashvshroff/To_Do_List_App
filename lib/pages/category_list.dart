@@ -16,17 +16,20 @@ class _CategoryListState extends State<CategoryList> {
 
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  Future createAlertDialog(BuildContext context) {
+  Future createAlertDialog(
+      BuildContext context, String name, String colour, String title) {
     //dialog box for adding a category
     TextEditingController newCategoryName = TextEditingController();
     String newCategoryColour;
     Map returnData = {};
+    newCategoryName.text = name;
+    newCategoryColour = colour;
     return showDialog(
         context: context,
         builder: (context) {
           return StatefulBuilder(builder: (context, setState) {
             return AlertDialog(
-              title: Text("ADD CATEGORY"),
+              title: Text(title.toUpperCase()),
               titleTextStyle: TextStyle(color: textColor, fontSize: 24.0),
               backgroundColor: bgColorSecondary,
               content: Container(
@@ -136,7 +139,7 @@ class _CategoryListState extends State<CategoryList> {
               color: textColor,
             ),
             onPressed: () {
-              addNewCategory();
+              addNewCategory(-1);
             },
           ),
         ],
@@ -185,9 +188,12 @@ class _CategoryListState extends State<CategoryList> {
                   ),
                   Flexible(
                     child: ListTile(
+                      onTap: () {
+                        addNewCategory(index);
+                      },
                       title: Text(
                         this.categoryList[index].categoryName,
-                        style: TextStyle(color: textColor, fontSize: 24.0),
+                        style: TextStyle(color: textColor, fontSize: 22.0),
                       ),
                       trailing: IconButton(
                           icon: Icon(
@@ -226,11 +232,23 @@ class _CategoryListState extends State<CategoryList> {
     );
   }
 
-  void addNewCategory() async {
+  void addNewCategory(int index) async {
     //saves new category to db
     String newName;
     String newColour;
-    Map data = await createAlertDialog(context);
+    String name;
+    String colour;
+    String title;
+    if (index == -1) {
+      name = '';
+      colour = '';
+      title = 'ADD CATEGORY';
+    } else {
+      name = this.categoryList[index].categoryName;
+      colour = this.categoryList[index].categoryColour;
+      title = 'EDIT CATEGORY';
+    }
+    Map data = await createAlertDialog(context, name, colour, title);
     if (data != null) {
       if (data['name'] == '') {
         showSnackBar(false, "Error, can't have category without a name.");
@@ -240,12 +258,18 @@ class _CategoryListState extends State<CategoryList> {
       newColour = (data['colour'] != '') ? data['colour'] : 'grey';
       int count = categoryCount;
       for (int i = 0; i < count; i++) {
-        if (this.categoryList[i].categoryName == newName) {
+        if (this.categoryList[i].categoryName == newName && i != index) {
           showSnackBar(false, "Error, this category already exists.");
           return;
         }
       }
-      createCategory(newName, newColour);
+      if (index == -1) {
+        createCategory(newName, newColour);
+      } else {
+        this.categoryList[index].categoryName = newName;
+        this.categoryList[index].categoryColour = newColour;
+        saveColourChange(index);
+      }
     }
     updateList();
   }
