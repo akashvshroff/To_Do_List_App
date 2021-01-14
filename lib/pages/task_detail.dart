@@ -106,12 +106,15 @@ class _TaskDetailState extends State<TaskDetail> {
                       items: this.categoryList?.map((Category instance) {
                             return DropdownMenuItem(
                                 value: instance.categoryName.toString(),
-                                child: Text(
-                                  instance.categoryName,
-                                  style: TextStyle(
-                                      color: getCategoryColour(
-                                          instance.categoryId),
-                                      fontSize: 22.0),
+                                child: SizedBox(
+                                  width: 145.0,
+                                  child: Text(
+                                    instance.categoryName,
+                                    style: TextStyle(
+                                        color: getCategoryColour(
+                                            instance.categoryId),
+                                        fontSize: 20.0),
+                                  ),
                                 ));
                           })?.toList() ??
                           [],
